@@ -2,7 +2,7 @@ package org.itss.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.itss.dto.request.SpotSearchRequest;
-import org.itss.dto.response.ApiResponse;
+import org.itss.dto.response.Result;
 import org.itss.service.SpotService;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.*;
 public class SpotController {
 
     private final SpotService spotService;
+
     @GetMapping("/{id}")
-    public ApiResponse<?> getSpotById(@PathVariable String id) {
+    public Result getSpotById(@PathVariable String id) {
         return spotService.getSpotById(id);
     }
 
     @GetMapping("/search")
-    public ApiResponse<?> search(SpotSearchRequest req) {
+    public Result search(SpotSearchRequest req) {
         return spotService.search(req);
     }
 }
