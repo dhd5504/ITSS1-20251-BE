@@ -4,34 +4,45 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import jakarta.annotation.PostConstruct; // Nếu dùng Spring Boot cũ (<3.0) thì đổi thành javax.annotation.PostConstruct
 
 import javax.crypto.SecretKey;
+import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-@Component // 1. Đánh dấu để Spring quản lý (Bean)
+@Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}") // 2. Lấy key từ file properties
+    @Value("${jwt.secret}")
     private String secretString;
 
-    @Value("${jwt.expiration:86400000}") // Lấy thời gian hết hạn (mặc định 86400000 nếu không tìm thấy)
-    private long expirationTime;
+    @Value("${jwt.access-expire-ms:900000}")  // 15 phút
+    private long accessExpire;
+
+    @Value("${jwt.refresh-expire-ms:1209600000}") // 14 ngày
+    private long refreshExpire;
 
     private SecretKey key;
 
-    // 3. Hàm này chạy tự động sau khi Spring inject xong giá trị vào secretString
     @PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String username) {
+    public String generateAccessToken(String username) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expirationTime)) // Sử dụng biến expirationTime
+                .expiration(new Date(System.currentTimeMillis() + accessExpire))
+                .signWith(key)
+                .compact();
+    }
+
+    public String generateRefreshToken(String username) {
+        return Jwts.builder()
+                .subject(username)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + refreshExpire))
                 .signWith(key)
                 .compact();
     }
@@ -45,8 +56,16 @@ public class JwtUtil {
                     .getPayload()
                     .getSubject();
         } catch (Exception e) {
-            // Token không hợp lệ hoặc hết hạn
             return null;
+        }
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }

@@ -1,0 +1,100 @@
+package org.itss.service.impl;
+
+import org.itss.dto.request.auth.LoginRequest;
+import org.itss.dto.request.auth.RegisterRequest;
+import org.itss.dto.request.auth.TokenRefreshRequest;
+import org.itss.dto.response.Result;
+import org.itss.dto.response.auth.TokenResponse;
+import org.itss.entity.User;
+import org.itss.repository.UserRepository;
+import org.itss.security.JwtUtil;
+import org.itss.service.AuthService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AuthServiceImpl implements AuthService {
+
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder encoder;
+    private final JwtUtil jwtUtil;
+
+    @Override
+    public Result register(RegisterRequest request) {
+
+        if (userRepository.existsByEmail(request.getEmail()))
+            return Result.error("Email already exists");
+
+        if (userRepository.existsByUsername(request.getUsername()))
+            return Result.error("Username already exists");
+
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setUsername(request.getUsername());
+        user.setPassword(encoder.encode(request.getPassword()));
+        userRepository.save(user);
+
+        return Result.ok("Register success");
+    }
+
+    @Override
+    public Result login(LoginRequest request, HttpServletResponse res) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Email does not exist"));
+
+        if (!encoder.matches(request.getPassword(), user.getPassword()))
+            throw new RuntimeException("Wrong password");
+
+        String accessToken = jwtUtil.generateAccessToken(user.getUsername());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
+
+        // lưu refresh token vào DB
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
+        // set cookie access_token
+        Cookie cookie = new Cookie("access_token", accessToken);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(24 * 60 * 60);
+        res.addCookie(cookie);
+
+        return Result.ok(new TokenResponse(accessToken, refreshToken));
+    }
+
+    @Override
+    public Result refreshToken(TokenRefreshRequest request) {
+
+        User user = userRepository.findByRefreshToken(request.getRefreshToken())
+                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+
+        if (!jwtUtil.validateToken(request.getRefreshToken()))
+            return Result.error("Refresh token expired");
+
+        String newAccess = jwtUtil.generateAccessToken(user.getUsername());
+        String newRefresh = jwtUtil.generateRefreshToken(user.getUsername());
+
+        user.setRefreshToken(newRefresh);
+        userRepository.save(user);
+
+        return Result.ok(new TokenResponse(newAccess, newRefresh));
+    }
+
+    @Override
+    public Result logout(HttpServletResponse res) {
+
+        Cookie cookie = new Cookie("access_token", "");
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        res.addCookie(cookie);
+
+        return Result.ok("Logged out");
+    }
+}
