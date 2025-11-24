@@ -14,7 +14,11 @@ public class User {
 
     private String username;
 
+    @Column(unique = true)
     private String email;
 
     private String password;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
 }
