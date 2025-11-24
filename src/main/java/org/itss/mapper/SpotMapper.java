@@ -10,16 +10,22 @@ public class SpotMapper {
     public SpotSearchResponse.SpotSummary toSummary(
             Spot spot,
             double rating,
-            double distance
+            double distance,
+            java.util.List<org.itss.entity.Review> reviews
     ) {
         return SpotSearchResponse.SpotSummary.builder()
                 .id(spot.getId())
                 .name(spot.getName())
-                .location(spot.getLocation())
-                .imageUrl(spot.getImageUrl())
                 .category(spot.getCategory())
-                .rating(rating)
+                .address(spot.getLocation())
                 .distance(distance)
+                .hours(spot.isAlwaysOpen() ? "24時間営業" : spot.getOpenTime() + "-" + spot.getCloseTime())
+                .image(spot.getImageUrl())
+                .rating(rating)
+                .price(spot.getPricing())
+                .phone(spot.getPhone())
+                .features(spot.getFeatures())
+                .reviews(reviews)
                 .build();
     }
 }

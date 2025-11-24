@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))   // 🔥 BẮT BUỘC
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/spots/**").permitAll()  // 🔥 Cho phép public search
                         .anyRequest().authenticated()
                 );
 

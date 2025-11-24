@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 public class SpotController {
 
     private final SpotService spotService;
+    @GetMapping("/{id}")
+    public ApiResponse<?> getSpotById(@PathVariable String id) {
+        return spotService.getSpotById(id);
+    }
 
     @GetMapping("/search")
     public ApiResponse<?> search(SpotSearchRequest req) {

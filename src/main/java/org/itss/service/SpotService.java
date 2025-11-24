@@ -5,4 +5,5 @@ import org.itss.dto.response.ApiResponse;
 
 public interface SpotService {
     ApiResponse<?> search(SpotSearchRequest req);
+    ApiResponse<?> getSpotById(String id);
 }

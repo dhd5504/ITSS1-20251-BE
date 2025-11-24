@@ -8,6 +8,9 @@ import lombok.Setter;
 public class SpotSearchRequest {
     private String q;  // từ khóa tìm kiếm theo tên quán
     private String category;  //loại : coffe, tea,..
+    private String group;
+    private String suitable;
+    private String price;
     private Double lat;  // vĩ độ của user
     private Double lng;  // kinh độ của user
     private Double maxDistance;  // Khoảng cách tối đa

@@ -17,10 +17,15 @@ public class SpotSearchResponse {
     public static class SpotSummary {
         private String id;
         private String name;
-        private String location;
-        private double distance;
-        private double rating;
-        private String imageUrl;
         private String category;
+        private String address;
+        private double distance;
+        private String hours;
+        private String image;
+        private double rating;
+        private String price;
+        private String phone;
+        private String features;
+        private List<org.itss.entity.Review> reviews;
     }
 }
