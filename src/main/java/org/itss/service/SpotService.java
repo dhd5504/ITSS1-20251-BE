@@ -1,9 +1,9 @@
 package org.itss.service;
 
 import org.itss.dto.request.SpotSearchRequest;
-import org.itss.dto.response.ApiResponse;
+import org.itss.dto.response.Result;
 
 public interface SpotService {
-    ApiResponse<?> search(SpotSearchRequest req);
-    ApiResponse<?> getSpotById(String id);
+    Result search(SpotSearchRequest req);
+    Result getSpotById(String id);
 }

@@ -1,25 +1,28 @@
 package org.itss.mapper;
 
-import org.itss.dto.response.SpotSearchResponse;
+import org.itss.dto.response.spot.SpotItemResponse;
 import org.itss.entity.Spot;
+import org.itss.entity.Review;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class SpotMapper {
 
-    public SpotSearchResponse.SpotSummary toSummary(
+    public SpotItemResponse toItem(
             Spot spot,
             double rating,
             double distance,
-            java.util.List<org.itss.entity.Review> reviews
+            List<Review> reviews
     ) {
-        return SpotSearchResponse.SpotSummary.builder()
+        return SpotItemResponse.builder()
                 .id(spot.getId())
                 .name(spot.getName())
                 .category(spot.getCategory())
                 .address(spot.getLocation())
                 .distance(distance)
-                .hours(spot.isAlwaysOpen() ? "24時間営業" : spot.getOpenTime() + "-" + spot.getCloseTime())
+                .hours(resolveWorkingHours(spot))
                 .image(spot.getImageUrl())
                 .rating(rating)
                 .price(spot.getPricing())
@@ -27,5 +30,18 @@ public class SpotMapper {
                 .features(spot.getFeatures())
                 .reviews(reviews)
                 .build();
+    }
+
+    private String resolveWorkingHours(Spot spot) {
+        if (spot.isAlwaysOpen()) {
+            return "24時間営業"; // tiếng Nhật: 24-hour open
+        }
+        String open = safe(spot.getOpenTime());
+        String close = safe(spot.getCloseTime());
+        return open + " - " + close;
+    }
+
+    private String safe(String val) {
+        return val == null ? "" : val;
     }
 }
