@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ❌ Lỗi validate @Valid trong @RequestBody
+    // Lỗi validate @Valid trong @RequestBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result handleValidationException(MethodArgumentNotValidException e) {
@@ -25,28 +25,28 @@ public class GlobalExceptionHandler {
         return Result.error(message);
     }
 
-    // ❌ Lỗi validate dạng @RequestParam / @PathVariable
+    // Lỗi validate dạng @RequestParam / @PathVariable
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result handleConstraintViolation(ConstraintViolationException e) {
         return Result.error(e.getMessage());
     }
 
-    // ❌ Thiếu tham số request
+    // Thiếu tham số request
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result handleMissingRequestParam(MissingServletRequestParameterException e) {
         return Result.error("Missing parameter: " + e.getParameterName());
     }
 
-    // ❌ JSON parse lỗi
+    // JSON parse lỗi
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result handleInvalidJson(HttpMessageNotReadableException e) {
         return Result.error("Invalid request body");
     }
 
-    // ❌ Lỗi tùy chỉnh từ hệ thống của bạn
+    // Lỗi tùy chỉnh từ hệ thống của bạn
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result handleCustomException(RuntimeException e) {
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
         return Result.error(e.getMessage());
     }
 
-    // ❌ Lỗi không xác định
+    // Lỗi không xác định
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result handleException(Exception e) {
