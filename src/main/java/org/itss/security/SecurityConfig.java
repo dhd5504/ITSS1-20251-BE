@@ -65,8 +65,7 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))   // 🔥 BẮT BUỘC
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         // public: preflight + xem/search spot
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
