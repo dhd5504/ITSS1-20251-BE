@@ -18,5 +18,6 @@ public class SpotItemResponse {
     private String price;
     private String phone;
     private String features;
+    private String recommendedTransport;
     private List<?> reviews;   // có thể đổi sang DTO review riêng nếu muốn
 }
