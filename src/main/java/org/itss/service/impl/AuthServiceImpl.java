@@ -17,7 +17,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +31,12 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
 
     @Override
-    public Result register(RegisterRequest request) {
+    public Result register(@NonNull RegisterRequest request) {
 
-        if (userRepository.existsByEmail(request.getEmail()))
+        if (userRepository.existsByEmail(Objects.requireNonNull(request.getEmail())))
             return Result.error("Email already exists");
 
-        if (userRepository.existsByUsername(request.getUsername()))
+        if (userRepository.existsByUsername(Objects.requireNonNull(request.getUsername())))
             return Result.error("Username already exists");
 
         User user = new User();
@@ -46,9 +49,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Result login(LoginRequest request, HttpServletResponse res) {
+    public Result login(@NonNull LoginRequest request, @NonNull HttpServletResponse res) {
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(Objects.requireNonNull(request.getEmail()))
                 .orElseThrow(() -> new RuntimeException("Email does not exist"));
 
         if (!encoder.matches(request.getPassword(), user.getPassword()))
@@ -81,9 +84,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Result refreshToken(TokenRefreshRequest request) {
+    public Result refreshToken(@NonNull TokenRefreshRequest request) {
 
-        User user = userRepository.findByRefreshToken(request.getRefreshToken())
+        User user = userRepository.findByRefreshToken(Objects.requireNonNull(request.getRefreshToken()))
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
 
         if (!jwtUtil.validateToken(request.getRefreshToken()))
@@ -99,7 +102,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Result logout(HttpServletResponse res) {
+    public Result logout(@NonNull HttpServletResponse res) {
 
         Cookie cookie = new Cookie("access_token", "");
         cookie.setMaxAge(0);

@@ -9,6 +9,8 @@ import org.itss.dto.request.spot.SpotSearchRequest;
 import org.itss.dto.response.Result;
 import org.itss.service.SpotService;
 import org.springframework.security.core.Authentication;
+import org.springframework.lang.NonNull;
+import java.util.Objects;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,14 +20,25 @@ public class SpotController {
 
     private final SpotService spotService;
 
+    @GetMapping("/favorites")
+    public Result getFavorites(Authentication authentication) {
+        String name = (authentication != null) ? authentication.getName() : "anonymous";
+        return spotService.getFavorites(Objects.requireNonNull(name));
+    }
+
+    @GetMapping("/search")
+    public Result search(@NonNull SpotSearchRequest req) {
+        return spotService.search(Objects.requireNonNull(req));
+    }
+
     @GetMapping("/{id}")
-    public Result getSpotById(@PathVariable String id) {
-        return spotService.getSpotById(id);
+    public Result getSpotById(@PathVariable @NonNull String id) {
+        return spotService.getSpotById(Objects.requireNonNull(id));
     }
 
     @GetMapping("/{id}/reviews")
     public Result getSpotReviews(
-            @PathVariable String id,
+            @PathVariable @NonNull String id,
             @RequestParam(name = "sort_by", required = false) String sortBySnake,
             @RequestParam(name = "sortBy", required = false) String sortByCamel,
             @RequestParam(name = "limit", required = false) Integer limit,
@@ -35,42 +48,50 @@ public class SpotController {
         req.setSortBy(sortBySnake != null ? sortBySnake : sortByCamel);
         req.setLimit(limit);
         req.setPage(page);
-        return spotService.getSpotReviews(id, req);
-    }
-
-    @GetMapping("/search")
-    public Result search(SpotSearchRequest req) {
-        return spotService.search(req);
+        return spotService.getSpotReviews(Objects.requireNonNull(id), Objects.requireNonNull(req));
     }
 
     @PostMapping("/{id}/reviews")
     public Result createReview(
-            @PathVariable String id,
-            @Valid @RequestBody ReviewCreateRequest req,
+            @PathVariable @NonNull String id,
+            @Valid @RequestBody @NonNull ReviewCreateRequest req,
             Authentication authentication
     ) {
-        String userId = (authentication != null) ? authentication.getName() : "anonymous";
-        return spotService.addReview(id, req, userId);
+        String name = (authentication != null) ? authentication.getName() : "anonymous";
+        return spotService.addReview(id, req, Objects.requireNonNull(name));
     }
 
     @PutMapping("/{spotId}/reviews/{reviewId}")
     public Result updateReview(
-            @PathVariable String spotId,
-            @PathVariable String reviewId,
-            @Valid @RequestBody ReviewUpdateRequest req,
+            @PathVariable @NonNull String spotId,
+            @PathVariable @NonNull String reviewId,
+            @Valid @RequestBody @NonNull ReviewUpdateRequest req,
             Authentication authentication
     ) {
-        String userId = (authentication != null) ? authentication.getName() : "anonymous";
-        return spotService.updateReview(spotId, reviewId, req, userId);
+        String name = (authentication != null) ? authentication.getName() : "anonymous";
+        return spotService.updateReview(spotId, reviewId, req, Objects.requireNonNull(name));
     }
 
     @DeleteMapping("/{spotId}/reviews/{reviewId}")
     public Result deleteReview(
-            @PathVariable String spotId,
-            @PathVariable String reviewId,
+            @PathVariable @NonNull String spotId,
+            @PathVariable @NonNull String reviewId,
             Authentication authentication
     ) {
-        String userId = (authentication != null) ? authentication.getName() : "anonymous";
-        return spotService.deleteReview(spotId, reviewId, userId);
+        String name = (authentication != null) ? authentication.getName() : "anonymous";
+        return spotService.deleteReview(spotId, reviewId, Objects.requireNonNull(name));
     }
+
+    @PostMapping("/{id}/favorite")
+    public Result addFavorite(@PathVariable @NonNull String id, Authentication authentication) {
+        String name = (authentication != null) ? authentication.getName() : "anonymous";
+        return spotService.addFavorite(id, Objects.requireNonNull(name));
+    }
+
+    @DeleteMapping("/{id}/favorite")
+    public Result removeFavorite(@PathVariable @NonNull String id, Authentication authentication) {
+        String name = (authentication != null) ? authentication.getName() : "anonymous";
+        return spotService.removeFavorite(id, Objects.requireNonNull(name));
+    }
+
 }

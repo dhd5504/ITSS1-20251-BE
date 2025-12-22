@@ -1,5 +1,7 @@
 package org.itss.controller;
 
+import org.springframework.lang.NonNull;
+
 import org.itss.dto.request.auth.LoginRequest;
 import org.itss.dto.request.auth.RegisterRequest;
 import org.itss.dto.request.auth.TokenRefreshRequest;
@@ -20,22 +22,22 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public Result register(@RequestBody RegisterRequest request) {
-        return authService.register(request);
+    public Result register(@RequestBody @NonNull RegisterRequest request) {
+        return authService.register(java.util.Objects.requireNonNull(request));
     }
 
     @PostMapping("/login")
-    public Result login(@RequestBody LoginRequest request, HttpServletResponse res) {
-        return authService.login(request, res);
+    public Result login(@RequestBody @NonNull LoginRequest request, @NonNull HttpServletResponse res) {
+        return authService.login(java.util.Objects.requireNonNull(request), java.util.Objects.requireNonNull(res));
     }
 
     @PostMapping("/refresh")
-    public Result refresh(@Valid @RequestBody TokenRefreshRequest request) {
-        return authService.refreshToken(request);
+    public Result refresh(@Valid @RequestBody @NonNull TokenRefreshRequest request) {
+        return authService.refreshToken(java.util.Objects.requireNonNull(request));
     }
 
     @PutMapping("/logout")
-    public Result logout(HttpServletResponse res) {
-        return authService.logout(res);
+    public Result logout(@NonNull HttpServletResponse res) {
+        return authService.logout(java.util.Objects.requireNonNull(res));
     }
 }

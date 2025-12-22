@@ -2,6 +2,8 @@ package org.itss.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -21,4 +23,12 @@ public class User {
 
     @Column(name = "refresh_token")
     private String refreshToken;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "user_favorite_spots",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "spot_id")
+    )
+    private Set<Spot> favorites = new HashSet<>();
 }

@@ -1,5 +1,7 @@
 package org.itss.service;
 
+import org.springframework.lang.NonNull;
+
 import org.itss.dto.request.auth.LoginRequest;
 import org.itss.dto.request.auth.RegisterRequest;
 import org.itss.dto.request.auth.TokenRefreshRequest;
@@ -9,11 +11,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
 
-    Result register(RegisterRequest request);
+    Result register(@NonNull RegisterRequest request);
 
-    Result login(LoginRequest request, HttpServletResponse res);
+    Result login(@NonNull LoginRequest request, @NonNull HttpServletResponse res);
 
-    Result refreshToken(TokenRefreshRequest request);
+    Result refreshToken(@NonNull TokenRefreshRequest request);
 
-    Result logout(HttpServletResponse res);
+    Result logout(@NonNull HttpServletResponse res);
 }
