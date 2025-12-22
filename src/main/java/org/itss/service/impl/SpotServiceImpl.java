@@ -18,7 +18,9 @@ import org.itss.mapper.SpotMapper;
 import org.itss.repository.ReviewRepository;
 import org.itss.repository.SpotRepository;
 import org.itss.repository.UserRepository;
+import org.itss.service.ExternalSimService;
 import org.itss.service.SpotService;
+import org.itss.service.TransportService;
 import org.itss.util.DistanceUtil;
 import org.itss.util.RatingUtil;
 import org.springframework.data.domain.Page;
@@ -46,6 +48,8 @@ public class SpotServiceImpl implements SpotService {
     private final UserRepository userRepository;
     private final SpotMapper spotMapper;
     private final ReviewMapper reviewMapper;
+    private final TransportService transportService;
+    private final ExternalSimService externalSimService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -77,7 +81,11 @@ public class SpotServiceImpl implements SpotService {
                         );
                     }
 
-                    return spotMapper.toItem(spot, rating, distance, reviews);
+                    String weather = externalSimService.getCurrentWeather();
+                    String traffic = externalSimService.getCurrentTraffic();
+                    String recommendedTransport = transportService.recommendTransport(distance, weather, traffic);
+
+                    return spotMapper.toItem(spot, rating, distance, reviews, recommendedTransport);
                 })
                 .collect(Collectors.toList());
 
@@ -277,7 +285,10 @@ public class SpotServiceImpl implements SpotService {
                 .map(spot -> {
                     List<Review> reviews = reviewRepository.findBySpotId(Objects.requireNonNull(spot.getId()));
                     double rating = RatingUtil.averageRating(Objects.requireNonNull(reviews));
-                    return spotMapper.toItem(spot, rating, 0.0, reviews);
+                    String weather = externalSimService.getCurrentWeather();
+                    String traffic = externalSimService.getCurrentTraffic();
+                    String recommendedTransport = transportService.recommendTransport(0.0, weather, traffic);
+                    return spotMapper.toItem(spot, rating, 0.0, reviews, recommendedTransport);
                 })
                 .collect(Collectors.toList());
 

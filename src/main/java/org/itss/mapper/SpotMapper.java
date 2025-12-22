@@ -16,7 +16,8 @@ public class SpotMapper {
             Spot spot,
             double rating,
             double distance,
-            List<Review> reviews
+            List<Review> reviews,
+            String recommendedTransport
     ) {
         return SpotItemResponse.builder()
                 .id(spot.getId())
@@ -30,6 +31,7 @@ public class SpotMapper {
                 .price(spot.getPricing())
                 .phone(spot.getPhone())
                 .features(spot.getFeatures())
+                .recommendedTransport(recommendedTransport)
                 .reviews(reviews)
                 .build();
     }
