@@ -4,6 +4,8 @@ import org.itss.dto.request.auth.LoginRequest;
 import org.itss.dto.request.auth.RegisterRequest;
 import org.itss.dto.request.auth.TokenRefreshRequest;
 import org.itss.dto.response.Result;
+import org.itss.dto.response.auth.AuthUserResponse;
+import org.itss.dto.response.auth.LoginResponse;
 import org.itss.dto.response.auth.TokenResponse;
 import org.itss.entity.User;
 import org.itss.repository.UserRepository;
@@ -66,7 +68,16 @@ public class AuthServiceImpl implements AuthService {
         cookie.setMaxAge(24 * 60 * 60);
         res.addCookie(cookie);
 
-        return Result.ok(new TokenResponse(accessToken, refreshToken));
+        AuthUserResponse authUser = AuthUserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .name(user.getUsername())
+                .avatar(null)
+                .role(null)
+                .build();
+
+        return Result.ok(new LoginResponse(authUser, accessToken, refreshToken));
     }
 
     @Override

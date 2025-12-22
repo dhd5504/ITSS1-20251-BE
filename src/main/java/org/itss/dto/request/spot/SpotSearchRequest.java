@@ -1,4 +1,4 @@
-package org.itss.dto.request;
+package org.itss.dto.request.spot;
 
 import lombok.Getter;
 import lombok.Setter;
