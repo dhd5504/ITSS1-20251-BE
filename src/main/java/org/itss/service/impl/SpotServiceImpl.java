@@ -177,6 +177,11 @@ public class SpotServiceImpl implements SpotService {
                 .map(u -> String.valueOf(u.getId()))
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Each user can leave only one review per spot
+        if (reviewRepository.existsBySpotIdAndUserId(spotId, userIdToSave)) {
+            return Result.error("You have already reviewed this spot");
+        }
+
         Review review = new Review();
         review.setSpotId(spot.getId());
         review.setUserId(userIdToSave);

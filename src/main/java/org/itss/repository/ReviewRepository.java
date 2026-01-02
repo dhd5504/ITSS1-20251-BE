@@ -12,4 +12,6 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, String> {
     List<Review> findBySpotId(@NonNull String spotId);
     Page<Review> findBySpotId(@NonNull String spotId, @NonNull Pageable pageable);
+
+    boolean existsBySpotIdAndUserId(@NonNull String spotId, @NonNull String userId);
 }
